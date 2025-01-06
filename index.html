@@ -12,15 +12,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f4f4f9;
+            min-height: 100vh;
+            background-color: #228B22; /* Forest Green */
+            color: white; /* Default text color */
         }
         .container {
             text-align: center;
             padding: 20px;
-            background: #fff;
+            background: #fff; /* White background for buttons */
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         input[type="number"], input[type="file"] {
             padding: 10px;
@@ -34,83 +35,142 @@
             margin: 10px;
             border: none;
             border-radius: 4px;
-            background-color: #007bff;
-            color: white;
+            background-color: white; /* White button */
+            color: black; /* Black text for buttons */
             cursor: pointer;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #ddd; /* Light gray on hover */
         }
         .result {
             margin-top: 20px;
             font-size: 1.2em;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the element */
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>ArcGIS Credit Cost Estimator</h1>
+        <p>This tool calculates estimated ArcGIS Online credit costs for feature hosting, tiled imagery, and GIS file uploads.</p>
 
-        <h3>Feature Hosting (MB):</h3>
+        <h3 class="tooltip">Feature Hosting (MB):
+            <span class="tooltip-text">Enter the size of your feature data in MB</span>
+        </h3>
         <input type="number" id="featureSize" placeholder="Enter file size in MB">
         <button onclick="calculateFeatureCost()">Calculate Cost</button>
         <div id="featureResult" class="result"></div>
 
-        <h3>Tiled Imagery Hosting (GB):</h3>
+        <h3 class="tooltip">Tiled Imagery Hosting (GB):
+            <span class="tooltip-text">Enter the size of your tiled imagery in GB</span>
+        </h3>
         <input type="number" id="imagerySize" placeholder="Enter file size in GB">
         <button onclick="calculateImageryCost()">Calculate Cost</button>
         <div id="imageryResult" class="result"></div>
 
-        <h3>Upload a File to Estimate Cost:</h3>
-        <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx">
+        <h3 class="tooltip">Upload a File to Estimate Cost:
+            <span class="tooltip-text">Supported file types: .tif, .gdb, .csv, .xls, .xlsx, .shp, .geojson, .kml, .kmz</span>
+        </h3>
+        <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx,.shp,.geojson,.kml,.kmz">
         <button onclick="calculateFileCost()">Upload & Calculate</button>
         <div id="fileResult" class="result"></div>
+        
+        <button onclick="resetAll()">Clear/Reset</button>
+        <div id="errorMessage" class="error"></div>
     </div>
 
     <script>
         function calculateFeatureCost() {
             const sizeMB = document.getElementById('featureSize').value;
-            if (!sizeMB || sizeMB < 0) {
-                alert("Please enter a valid size in MB.");
+            if (!sizeMB || sizeMB <= 0) {
+                showErrorMessage("Please enter a valid size in MB for feature hosting.");
                 return;
             }
             const cost = (sizeMB / 10) * 2.4;
             document.getElementById('featureResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
+            clearErrorMessage();
         }
 
         function calculateImageryCost() {
             const sizeGB = document.getElementById('imagerySize').value;
-            if (!sizeGB || sizeGB < 0) {
-                alert("Please enter a valid size in GB.");
+            if (!sizeGB || sizeGB <= 0) {
+                showErrorMessage("Please enter a valid size in GB for tiled imagery hosting.");
                 return;
             }
             const cost = sizeGB * 1.2;
             document.getElementById('imageryResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
+            clearErrorMessage();
         }
 
         function calculateFileCost() {
             const fileInput = document.getElementById('fileUpload');
             if (!fileInput.files.length) {
-                alert("Please select a file.");
+                showErrorMessage("Please select a file to upload.");
                 return;
             }
 
             const file = fileInput.files[0];
             const fileSizeMB = file.size / (1024 * 1024); // Convert bytes to MB
-
             let cost = 0;
+
             if (file.name.endsWith('.tif')) {
-                cost = fileSizeMB * 0.12; // Example: Imagery hosting cost per MB
-            } else if (file.name.endsWith('.gdb')) {
-                cost = (fileSizeMB / 10) * 2.4; // Example: Feature hosting cost
-            } else if (file.name.endsWith('.csv') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
-                cost = (fileSizeMB / 10) * 2.4; // Example: CSV/Excel as feature data
+                cost = fileSizeMB * 0.12; // Imagery hosting rate
+            } else if (file.name.endsWith('.gdb') || file.name.endsWith('.csv') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                cost = (fileSizeMB / 10) * 2.4; // Feature hosting rate
+            } else if (file.name.endsWith('.shp') || file.name.endsWith('.geojson') || file.name.endsWith('.kml') || file.name.endsWith('.kmz')) {
+                cost = (fileSizeMB / 10) * 2.4; // Feature hosting rate for these types
             } else {
-                alert("Unsupported file type. Please upload a TIF, GDB, CSV, or Excel file.");
+                showErrorMessage("Unsupported file type. Please upload a valid GIS file.");
                 return;
             }
 
             document.getElementById('fileResult').textContent = `File Size: ${fileSizeMB.toFixed(2)} MB | Cost: ${cost.toFixed(2)} credits/month`;
+            clearErrorMessage();
+        }
+
+        function resetAll() {
+            document.getElementById('featureSize').value = '';
+            document.getElementById('imagerySize').value = '';
+            document.getElementById('fileUpload').value = '';
+            document.getElementById('featureResult').textContent = '';
+            document.getElementById('imageryResult').textContent = '';
+            document.getElementById('fileResult').textContent = '';
+            clearErrorMessage();
+        }
+
+        function showErrorMessage(message) {
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function clearErrorMessage() {
+            document.getElementById('errorMessage').textContent = '';
         }
     </script>
 </body>
