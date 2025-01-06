@@ -24,15 +24,15 @@
         }
 
         header {
-            background-color: white; /* Header background remains white */
-            color: #0D5B90; /* Text color */
+            background-color: white;
+            color: #0D5B90;
             padding: 10px 20px;
             width: 100%;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         header h1 {
-            font-weight: 400; /* Adjusted to regular weight */
+            font-weight: 400;
             font-size: 2rem;
         }
 
@@ -61,10 +61,10 @@
             flex: 1 1 calc(33% - 20px);
             min-width: 300px;
             text-align: center;
-            height: 350px; /* Ensures all cards are the same height */
+            height: 350px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Keeps content evenly distributed */
+            justify-content: space-between;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .card:hover {
@@ -81,7 +81,7 @@
             color: #666;
             margin-bottom: 15px;
         }
-        .card input[type="number"], .card input[type="file"] {
+        .card input[type="number"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -89,19 +89,22 @@
             margin-bottom: 15px;
             font-size: 1rem;
         }
-        .card button {
-            background-color: #0D5B90; /* Matches header/footer */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 15px;
+        .drop-area {
+            border: 2px dashed #0D5B90;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #555;
+            text-align: center;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s, transform 0.2s;
         }
-        .card button:hover {
-            background-color: #083b61;
-            transform: scale(1.05);
+        .drop-area:hover {
+            background-color: #e0eaff;
+        }
+        .drop-area.dragover {
+            background-color: #cce5ff;
+            border-color: #0a69b8;
         }
         .result {
             margin-top: 10px;
@@ -110,22 +113,23 @@
             color: #333;
         }
 
-        .reset-btn {
-            margin-top: 20px;
+        button {
             background-color: #0D5B90;
             color: white;
             border: none;
-            padding: 10px 20px;
             border-radius: 5px;
+            padding: 15px 25px;
+            font-size: 1.2rem;
             cursor: pointer;
-            font-size: 1rem;
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
-        .reset-btn:hover {
+        button:hover {
             background-color: #083b61;
+            transform: scale(1.05);
         }
 
         footer {
-            background-color: #0D5B90; /* Matches header */
+            background-color: #0D5B90;
             color: white;
             text-align: center;
             padding: 15px 0;
@@ -170,12 +174,14 @@
             <div id="imageryResult" class="result"></div>
         </div>
 
-        <!-- File Upload Section -->
+        <!-- File Upload Section with Drag-and-Drop -->
         <div class="card">
             <h3>Upload a File</h3>
-            <p>Upload GIS files to estimate hosting costs. Supported: <strong>.tif, .gdb, .csv, .xls, .xlsx, .shp, .geojson, .kml, .kmz</strong>.</p>
-            <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx,.shp,.geojson,.kml,.kmz">
-            <button onclick="calculateFileCost()">Upload & Calculate</button>
+            <p>Drag and drop GIS files here to estimate hosting costs. Supported: <strong>.tif, .gdb, .csv, .xls, .xlsx, .shp, .geojson, .kml, .kmz</strong>.</p>
+            <div class="drop-area" id="dropArea">
+                Drag & Drop files here or click to browse.
+            </div>
+            <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx,.shp,.geojson,.kml,.kmz" style="display: none;">
             <div id="fileResult" class="result"></div>
         </div>
     </div>
@@ -191,6 +197,10 @@
     </footer>
 
     <script>
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileUpload');
+        const fileResult = document.getElementById('fileResult');
+
         function calculateFeatureCost() {
             const sizeMB = document.getElementById('featureSize').value;
             if (!sizeMB || sizeMB <= 0) {
@@ -211,14 +221,34 @@
             document.getElementById('imageryResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
         }
 
-        function calculateFileCost() {
-            const fileInput = document.getElementById('fileUpload');
-            if (!fileInput.files.length) {
-                alert("Please select a file to upload.");
-                return;
-            }
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
 
-            const file = fileInput.files[0];
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('dragover');
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
             const fileSizeMB = file.size / (1024 * 1024); // Convert bytes to MB
             let cost = 0;
 
@@ -229,20 +259,20 @@
             } else if (file.name.endsWith('.shp') || file.name.endsWith('.geojson') || file.name.endsWith('.kml') || file.name.endsWith('.kmz')) {
                 cost = (fileSizeMB / 10) * 2.4; // Feature hosting rate
             } else {
-                alert("Unsupported file type. Please upload a valid GIS file.");
+                fileResult.textContent = 'Unsupported file type. Please upload a valid GIS file.';
                 return;
             }
 
-            document.getElementById('fileResult').textContent = `File Size: ${fileSizeMB.toFixed(2)} MB | Cost: ${cost.toFixed(2)} credits/month`;
+            fileResult.textContent = `File: ${file.name} | Size: ${fileSizeMB.toFixed(2)} MB | Cost: ${cost.toFixed(2)} credits/month`;
         }
 
         function resetAll() {
             document.getElementById('featureSize').value = '';
             document.getElementById('imagerySize').value = '';
-            document.getElementById('fileUpload').value = '';
+            fileInput.value = '';
             document.getElementById('featureResult').textContent = '';
             document.getElementById('imageryResult').textContent = '';
-            document.getElementById('fileResult').textContent = '';
+            fileResult.textContent = '';
         }
     </script>
 </body>
