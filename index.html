@@ -4,144 +4,212 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArcGIS Credit Cost Estimator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Global Styles */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background-color: #f4f4f9; /* Light gray background */
+            margin: 0;
         }
-        .container {
+
+        header {
+            background-color: #0D5B90; /* New Header Color */
+            color: white;
+            padding: 20px 0;
+            width: 100%;
             text-align: center;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 1200px;
         }
-        .row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-        .section {
-            flex: 1 1 calc(33% - 20px);
-            margin: 10px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
-        .section h3 {
-            margin-bottom: 5px;
-        }
-        .section p {
-            font-size: 0.9em;
-            color: #666;
+        header img {
+            max-height: 50px;
             margin-bottom: 10px;
         }
-        .section input[type="number"], .section input[type="file"] {
+        header h1 {
+            font-weight: 600;
+            font-size: 2rem;
+        }
+        header p {
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            flex: 1 1 calc(33% - 20px);
+            min-width: 300px;
+            text-align: center;
+            height: 350px; /* Ensures all cards are the same height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Keeps content evenly distributed */
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .card h3 {
+            color: #0D5B90;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .card p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .card input[type="number"], .card input[type="file"] {
+            width: 100%;
             padding: 10px;
-            margin: 10px 0;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 100%; /* Ensures inputs stay within their container */
-            box-sizing: border-box; /* Includes padding and border in width calculation */
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 1rem;
         }
-        button {
-            padding: 10px 20px;
-            margin: 10px 0;
+        .card button {
+            background-color: #0D5B90; /* Matches header/footer */
+            color: white;
             border: none;
-            border-radius: 4px;
-            background-color: #007bff; /* Blue button */
-            color: white; /* White text */
+            border-radius: 5px;
+            padding: 10px 15px;
             cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s, transform 0.2s;
         }
-        button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+        .card button:hover {
+            background-color: #083b61;
+            transform: scale(1.05);
         }
         .result {
             margin-top: 10px;
-            font-size: 1.1em;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
         }
-        .error {
-            color: red;
-            margin-top: 10px;
+
+        .reset-btn {
+            margin-top: 20px;
+            background-color: #0D5B90;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .reset-btn:hover {
+            background-color: #083b61;
+        }
+
+        footer {
+            background-color: #0D5B90; /* Matches header */
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            width: 100%;
+            margin-top: auto;
+        }
+        footer p {
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <header>
+        <img src="https://www.blueraster.com/wp-content/themes/blueraster/core/images/logo.png.webp?ver=1.0.0" alt="Blue Raster Logo">
         <h1>ArcGIS Credit Cost Estimator</h1>
-        <p>This tool calculates estimated ArcGIS Online credit costs for feature hosting, tiled imagery, and GIS file uploads.</p>
-        <div class="row">
-            <!-- Feature Hosting Section -->
-            <div class="section">
-                <h3>Feature Hosting (MB):</h3>
-                <p>Enter the size of your feature data in MB.</p>
-                <input type="number" id="featureSize" placeholder="Enter file size in MB">
-                <button onclick="calculateFeatureCost()">Calculate Cost</button>
-                <div id="featureResult" class="result"></div>
-            </div>
+        <p>Quickly calculate hosting costs for feature data, imagery, and files.</p>
+    </header>
 
-            <!-- Tiled Imagery Hosting Section -->
-            <div class="section">
-                <h3>Tiled Imagery Hosting (GB):</h3>
-                <p>Enter the size of your tiled imagery in GB.</p>
-                <input type="number" id="imagerySize" placeholder="Enter file size in GB">
-                <button onclick="calculateImageryCost()">Calculate Cost</button>
-                <div id="imageryResult" class="result"></div>
-            </div>
-
-            <!-- File Upload Section -->
-            <div class="section">
-                <h3>Upload a File:</h3>
-                <p>Upload a GIS file to estimate its hosting cost. Supported file types: <strong>.tif</strong>, <strong>.gdb</strong>, <strong>.csv</strong>, <strong>.xls</strong>, <strong>.xlsx</strong>, <strong>.shp</strong>, <strong>.geojson</strong>, <strong>.kml</strong>, <strong>.kmz</strong>.</p>
-                <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx,.shp,.geojson,.kml,.kmz">
-                <button onclick="calculateFileCost()">Upload & Calculate</button>
-                <div id="fileResult" class="result"></div>
-            </div>
+    <div class="container">
+        <!-- Feature Hosting Section -->
+        <div class="card">
+            <h3>Feature Hosting (MB)</h3>
+            <p>Enter the size of your feature data in MB to calculate hosting costs.</p>
+            <input type="number" id="featureSize" placeholder="Enter file size in MB">
+            <button onclick="calculateFeatureCost()">Calculate Cost</button>
+            <div id="featureResult" class="result"></div>
         </div>
-        <!-- Reset and Error Messages -->
-        <button onclick="resetAll()">Clear/Reset</button>
-        <div id="errorMessage" class="error"></div>
+
+        <!-- Tiled Imagery Hosting Section -->
+        <div class="card">
+            <h3>Tiled Imagery Hosting (GB)</h3>
+            <p>Enter the size of your tiled imagery in GB to calculate hosting costs.</p>
+            <input type="number" id="imagerySize" placeholder="Enter file size in GB">
+            <button onclick="calculateImageryCost()">Calculate Cost</button>
+            <div id="imageryResult" class="result"></div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="card">
+            <h3>Upload a File</h3>
+            <p>Upload GIS files to estimate hosting costs. Supported: <strong>.tif, .gdb, .csv, .xls, .xlsx, .shp, .geojson, .kml, .kmz</strong>.</p>
+            <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx,.shp,.geojson,.kml,.kmz">
+            <button onclick="calculateFileCost()">Upload & Calculate</button>
+            <div id="fileResult" class="result"></div>
+        </div>
     </div>
+
+    <button class="reset-btn" onclick="resetAll()">Clear/Reset All</button>
+
+    <div style="margin: 20px;">
+        <button class="reset-btn" onclick="window.open('https://doc.arcgis.com/en/arcgis-online/administer/credits.htm#ESRI_SECTION1_709121D2C7694DCAB9B8592F36F7A5BA', '_blank')">
+            Learn More About ArcGIS Online Credits
+        </button>
+    </div>
+
+    <footer>
+        <p>Chris Messerich - Blue Raster</p>
+    </footer>
 
     <script>
         function calculateFeatureCost() {
             const sizeMB = document.getElementById('featureSize').value;
             if (!sizeMB || sizeMB <= 0) {
-                showErrorMessage("Please enter a valid size in MB for feature hosting.");
+                alert("Please enter a valid size in MB for feature hosting.");
                 return;
             }
             const cost = (sizeMB / 10) * 2.4;
             document.getElementById('featureResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
-            clearErrorMessage();
         }
 
         function calculateImageryCost() {
             const sizeGB = document.getElementById('imagerySize').value;
             if (!sizeGB || sizeGB <= 0) {
-                showErrorMessage("Please enter a valid size in GB for tiled imagery hosting.");
+                alert("Please enter a valid size in GB for tiled imagery hosting.");
                 return;
             }
             const cost = sizeGB * 1.2;
             document.getElementById('imageryResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
-            clearErrorMessage();
         }
 
         function calculateFileCost() {
             const fileInput = document.getElementById('fileUpload');
             if (!fileInput.files.length) {
-                showErrorMessage("Please select a file to upload.");
+                alert("Please select a file to upload.");
                 return;
             }
 
@@ -154,14 +222,13 @@
             } else if (file.name.endsWith('.gdb') || file.name.endsWith('.csv') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
                 cost = (fileSizeMB / 10) * 2.4; // Feature hosting rate
             } else if (file.name.endsWith('.shp') || file.name.endsWith('.geojson') || file.name.endsWith('.kml') || file.name.endsWith('.kmz')) {
-                cost = (fileSizeMB / 10) * 2.4; // Feature hosting rate for these types
+                cost = (fileSizeMB / 10) * 2.4; // Feature hosting rate
             } else {
-                showErrorMessage("Unsupported file type. Please upload a valid GIS file.");
+                alert("Unsupported file type. Please upload a valid GIS file.");
                 return;
             }
 
             document.getElementById('fileResult').textContent = `File Size: ${fileSizeMB.toFixed(2)} MB | Cost: ${cost.toFixed(2)} credits/month`;
-            clearErrorMessage();
         }
 
         function resetAll() {
@@ -171,15 +238,6 @@
             document.getElementById('featureResult').textContent = '';
             document.getElementById('imageryResult').textContent = '';
             document.getElementById('fileResult').textContent = '';
-            clearErrorMessage();
-        }
-
-        function showErrorMessage(message) {
-            document.getElementById('errorMessage').textContent = message;
-        }
-
-        function clearErrorMessage() {
-            document.getElementById('errorMessage').textContent = '';
         }
     </script>
 </body>
