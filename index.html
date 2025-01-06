@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ArcGIS Credit Cost Estimator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Global Styles */
         * {
@@ -13,7 +13,7 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #f0f4f8;
             color: #333;
             display: flex;
@@ -24,25 +24,26 @@
         }
 
         header {
-            background-color: white; /* Header background is now white */
-            color: #0D5B90; /* Text color matches the original header background color */
-            padding: 20px 0;
+            background-color: white; /* Header background remains white */
+            color: #0D5B90; /* Text color */
+            padding: 10px 20px;
             width: 100%;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        header img {
-            max-height: 50px;
-            margin-bottom: 10px;
-        }
         header h1 {
-            font-weight: 600;
+            font-weight: 400; /* Adjusted to regular weight */
             font-size: 2rem;
         }
-        header p {
-            font-size: 1rem;
-            margin-top: 5px;
+
+        .subtext {
+            margin: 20px 0;
+            font-size: 1.2rem;
+            color: #555;
+            text-align: center;
+            padding: 0 20px;
         }
+
         .container {
             width: 90%;
             max-width: 1200px;
@@ -131,17 +132,25 @@
             width: 100%;
             margin-top: auto;
         }
-        footer p {
-            font-size: 0.9rem;
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-       <header>
-        <img src="https://www.blueraster.com/wp-content/themes/blueraster/core/images/logo.png.webp?ver=1.0.0" alt="Blue Raster Logo">
+    <header>
         <h1>ArcGIS Credit Cost Estimator</h1>
-        <p>Quickly calculate hosting costs for feature data, imagery, and files.</p>
     </header>
+
+    <div class="subtext">
+        Quickly calculate the estimated hosting costs for feature data, imagery, and files.
+    </div>
+
     <div class="container">
         <!-- Feature Hosting Section -->
         <div class="card">
@@ -173,14 +182,12 @@
 
     <button class="reset-btn" onclick="resetAll()">Clear/Reset All</button>
 
-    <div style="margin: 20px;">
-        <button class="reset-btn" onclick="window.open('https://doc.arcgis.com/en/arcgis-online/administer/credits.htm#ESRI_SECTION1_709121D2C7694DCAB9B8592F36F7A5BA', '_blank')">
-            Learn More About ArcGIS Online Credits
-        </button>
-    </div>
-
     <footer>
-        <p>Chris Messerich - Blue Raster</p>
+        <p>
+            <a href="https://github.com/cmesserich-br/arcgis-online-credit-calculator" target="_blank">
+                Chris Messerich - Blue Raster
+            </a>
+        </p>
     </footer>
 
     <script>
