@@ -202,7 +202,9 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
         const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileUpload');
         const confettiSound = document.getElementById('confettiSound');
+        const fileResult = document.getElementById('fileResult');
 
         function calculateFeatureCost() {
             const sizeMB = document.getElementById('featureSize').value;
@@ -236,6 +238,19 @@
         dropArea.addEventListener('drop', (e) => {
             e.preventDefault();
             dropArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
 
             // Play the MP3
             confettiSound.currentTime = 0;
@@ -250,19 +265,18 @@
                 colors: ['#0D5B90', '#FFFFFF', '#B0B0B0'],
             });
 
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                console.log(`Dropped file: ${files[0].name}`);
-            }
-        });
+            const fileSizeMB = file.size / (1024 * 1024); // Convert bytes to MB
+            const cost = (fileSizeMB / 10) * 2.4; // Example calculation
+            fileResult.textContent = `File: ${file.name} | Size: ${fileSizeMB.toFixed(2)} MB | Cost: ${cost.toFixed(2)} credits/month`;
+        }
 
         function resetAll() {
             document.getElementById('featureSize').value = '';
             document.getElementById('imagerySize').value = '';
-            document.getElementById('fileUpload').value = '';
+            fileInput.value = '';
             document.getElementById('featureResult').textContent = '';
             document.getElementById('imageryResult').textContent = '';
-            document.getElementById('fileResult').textContent = '';
+            fileResult.textContent = '';
         }
     </script>
 </body>
