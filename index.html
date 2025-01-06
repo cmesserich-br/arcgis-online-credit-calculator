@@ -22,7 +22,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        input {
+        input[type="number"], input[type="file"] {
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ddd;
@@ -50,18 +50,21 @@
 <body>
     <div class="container">
         <h1>ArcGIS Credit Cost Estimator</h1>
-        <div>
-            <h3>Feature Hosting (MB):</h3>
-            <input type="number" id="featureSize" placeholder="Enter file size in MB">
-            <button onclick="calculateFeatureCost()">Calculate Cost</button>
-            <div id="featureResult" class="result"></div>
-        </div>
-        <div>
-            <h3>Tiled Imagery Hosting (GB):</h3>
-            <input type="number" id="imagerySize" placeholder="Enter file size in GB">
-            <button onclick="calculateImageryCost()">Calculate Cost</button>
-            <div id="imageryResult" class="result"></div>
-        </div>
+
+        <h3>Feature Hosting (MB):</h3>
+        <input type="number" id="featureSize" placeholder="Enter file size in MB">
+        <button onclick="calculateFeatureCost()">Calculate Cost</button>
+        <div id="featureResult" class="result"></div>
+
+        <h3>Tiled Imagery Hosting (GB):</h3>
+        <input type="number" id="imagerySize" placeholder="Enter file size in GB">
+        <button onclick="calculateImageryCost()">Calculate Cost</button>
+        <div id="imageryResult" class="result"></div>
+
+        <h3>Upload a File to Estimate Cost:</h3>
+        <input type="file" id="fileUpload" accept=".tif,.gdb,.csv,.xls,.xlsx">
+        <button onclick="calculateFileCost()">Upload & Calculate</button>
+        <div id="fileResult" class="result"></div>
     </div>
 
     <script>
@@ -83,6 +86,31 @@
             }
             const cost = sizeGB * 1.2;
             document.getElementById('imageryResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
+        }
+
+        function calculateFileCost() {
+            const fileInput = document.getElementById('fileUpload');
+            if (!fileInput.files.length) {
+                alert("Please select a file.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const fileSizeMB = file.size / (1024 * 1024); // Convert bytes to MB
+
+            let cost = 0;
+            if (file.name.endsWith('.tif')) {
+                cost = fileSizeMB * 0.12; // Example: Imagery hosting cost per MB
+            } else if (file.name.endsWith('.gdb')) {
+                cost = (fileSizeMB / 10) * 2.4; // Example: Feature hosting cost
+            } else if (file.name.endsWith('.csv') || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+                cost = (fileSizeMB / 10) * 2.4; // Example: CSV/Excel as feature data
+            } else {
+                alert("Unsupported file type. Please upload a TIF, GDB, CSV, or Excel file.");
+                return;
+            }
+
+            document.getElementById('fileResult').textContent = `File Size: ${fileSizeMB.toFixed(2)} MB | Cost: ${cost.toFixed(2)} credits/month`;
         }
     </script>
 </body>
