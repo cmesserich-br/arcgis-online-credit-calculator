@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcGIS Credit Cost Estimator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 80%;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ArcGIS Credit Cost Estimator</h1>
+        <div>
+            <h3>Feature Hosting (MB):</h3>
+            <input type="number" id="featureSize" placeholder="Enter file size in MB">
+            <button onclick="calculateFeatureCost()">Calculate Cost</button>
+            <div id="featureResult" class="result"></div>
+        </div>
+        <div>
+            <h3>Tiled Imagery Hosting (GB):</h3>
+            <input type="number" id="imagerySize" placeholder="Enter file size in GB">
+            <button onclick="calculateImageryCost()">Calculate Cost</button>
+            <div id="imageryResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculateFeatureCost() {
+            const sizeMB = document.getElementById('featureSize').value;
+            if (!sizeMB || sizeMB < 0) {
+                alert("Please enter a valid size in MB.");
+                return;
+            }
+            const cost = (sizeMB / 10) * 2.4;
+            document.getElementById('featureResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
+        }
+
+        function calculateImageryCost() {
+            const sizeGB = document.getElementById('imagerySize').value;
+            if (!sizeGB || sizeGB < 0) {
+                alert("Please enter a valid size in GB.");
+                return;
+            }
+            const cost = sizeGB * 1.2;
+            document.getElementById('imageryResult').textContent = `Cost: ${cost.toFixed(2)} credits/month`;
+        }
+    </script>
+</body>
+</html>
