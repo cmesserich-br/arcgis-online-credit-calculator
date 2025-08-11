@@ -18,7 +18,7 @@ A lightweight web-based tool to estimate ArcGIS Online credit costs for hosting 
 
 ## Live Demo
 Access the live version of this tool hosted on GitHub Pages:
-[ArcGIS Online Credit Cost Estimator](https://yourusername.github.io/arcgis-credit-calculator-web](https://cmesserich-br.github.io/arcgis-online-credit-calculator/)
+[ArcGIS Online Credit Cost Estimator](https://cmesserich-br.github.io/arcgis-online-credit-calculator/)
 
 ## How It Works
 1. **Manual Input**:
